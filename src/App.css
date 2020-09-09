@@ -1,0 +1,272 @@
+.App {
+  text-align: center;
+}
+.pageContent{
+  width: 90%;
+  margin-right: auto;
+  margin-left: auto;
+}
+.dropdown-menu.show{
+  width:70%;
+  text-align: center;
+}
+.loginTitle{
+  background-color: rgb(12, 1, 41);
+  text-align: center;
+  width: 100%;
+  color: white;
+}
+.show>.btn-primary.dropdown-toggle {
+  width: 70%;
+}
+
+.btn-primary.dropdown-toggle:hover, .btn-primary.dropdown-toggle:focus {
+ width: 70%;
+}
+
+.my-container {
+  position: relative;
+  /* 0 */
+  overflow: hidden;
+  height:400px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+
+}
+ .ddposition {  height: auto;
+  
+  display: flex;
+  direction: row;
+  justify-content: center;
+  width: 100%;
+ bottom: 0;
+ margin-top: -30px;
+
+  position: absolute;
+  z-index: 2; 
+ 
+} 
+.ddButton{
+  width:70%; 
+  position:absolute;
+   z-index:3;
+   color: white;
+   box-shadow: 5px 5px 8px grey;
+   bottom:0 ;
+   border: 2px solid wheat;  
+}
+.drp {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+ width: 100%;
+  /* box-shadow: 5px 5px 8px grey; */
+  /* background-image: linear-gradient(to right, rgb(12, 1, 41), black, rgb(13, 1, 44)); */
+  text-align: center;
+
+}
+.eachListItem{
+  box-shadow: 5px 5px 8px rgb(218, 216, 216);
+  border-bottom: 0.5px solid rgb(204, 204, 204);
+  border-radius: 50px;
+}
+.btn-primary.dropdown-toggle {
+  width: 70%;
+  border-radius: 25px;
+  background-image: linear-gradient(to right, rgb(12, 1, 41), black, rgb(13, 1, 44));
+}
+.tableTitle{
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: center;
+  font-family: 'Times New Roman', Times, serif;
+  color: rgb(13, 1, 44);
+  margin-top: 30px;
+}
+.imgClass{
+  height: 350px;
+  background-image: url("https://media.gettyimages.com/photos/coins-in-a-mason-jar-over-white-background-picture-id670907067?s=2048x2048");
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* padding-top: 100px; */
+  /* padding-bottom: 5px; */
+  width: 100%;
+}
+.title{
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  width: 100%;
+  text-align: center;
+  font-weight: 500;
+  color:rgb(1, 1, 54) ;
+  margin-bottom: 50px;
+  text-shadow: 0px 5px 15px  rgb(210, 210, 248);
+}
+th{
+  border:1px solid rgb(228, 228, 255)
+ 
+}
+
+.loginItems{
+  width: 90%;
+  box-shadow: 5px 5px 10px gray;
+  
+}
+
+.imgClass img {
+
+ width: 100%;
+  height:auto;
+  z-index: 1;
+  
+}
+.csv-reader-input{
+  border: 2px solid rgb(160, 154, 154);
+  padding: 10px;
+  /* width: max-content; */
+  
+}
+
+.fileuploadTitle{
+  font-size: 40px;
+  font-weight: 300;
+  margin-bottom: 50px;
+}
+@media screen and (max-width: 425px) {
+  .loginForm{
+    margin-top: 50px;
+   display: flex;
+   flex-direction: row;
+   justify-content: center;
+   width: 100%;
+   margin: 0 auto;
+   margin-top: 30px;
+  }
+  .frontPageContent{
+    margin:0 auto;
+    width:100%;
+    height:100%;
+  }
+  .fileuploadTitle{
+    font-size: 20px;
+    font-weight: 200;
+    margin-bottom: 50px;
+  }
+  .uploadFile{
+    text-align: center;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    padding-bottom: 20px;
+  width: 100%;
+  margin-top: 50px;
+  box-shadow: 5px 5px 10px gray;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(241, 249, 250);
+  }  
+  .csv-reader-input{
+    border: 0px solid rgb(160, 154, 154);
+    padding: 0px;
+    /* width: max-content; */
+    
+  }
+}
+@media screen and (min-width: 426px) {
+  .loginForm{
+    margin-top: 50px;
+   display: flex;
+   flex-direction: row;
+   justify-content: center;
+   width: 50%;
+   margin: 0 auto;
+   margin-top: 30px;
+  }
+  .frontPageContent{
+    margin:0 auto;
+    width:50%;
+    height:100%;
+
+  }
+.uploadFile{
+  text-align: center;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  padding-bottom: 20px;
+width: 80%;
+margin-top: 50px;
+box-shadow: 5px 5px 10px gray;
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+background-color: rgb(241, 249, 250);
+}}
+.adminContent{
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+.recentUpdateTable{
+  margin: 0 auto;
+  width: 90%;
+ 
+  margin-bottom: 10px;
+}
+th{
+  border:1px solid grey
+}
+.eachItem{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  width: 100%;
+  padding: 10px;
+}
+.daterange{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-size: 15px;
+}
+.scripPosition{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.listItems{
+  /* background-image: linear-gradient(to bottom, white, rgb(238, 237, 237), rgb(245, 243, 243)); */
+  border-radius: 18px;
+  margin-top: 20px;
+  border-bottom: 1px solid rgb(202, 200, 200);
+  background-color: rgb(224, 224, 224);
+box-shadow: 6px 5px 5px rgb(204, 204, 204);
+}
+react-datepicker__input-container input{
+  border:0px;
+  color:grey;
+}
+
+.frontPagetitle{
+  font-family: 'Times New Roman', Times, serif;
+  margin-bottom: 30px;
+  font-weight: 600;
+  border-bottom: 0.5px solid rgb(204, 204, 204);
+  text-align: center;
+  margin-top: 30px;
+  color:" rgb(12, 1, 41)"
+
+}
+.listHead{
+  font-weight: 500;
+  margin-top: 5px;
+}
