@@ -17,7 +17,7 @@ const AdminControls = () => {
     const sendReq=async(record)=>{
       try{
         console.log("req sent")
-      const res = await axios.post("http://localhost:8000/updatedData/",JSON.stringify(record))
+      const res = await axios.post("http://ec2-3-21-125-163.us-east-2.compute.amazonaws.com/updatedData/",JSON.stringify(record))
       console.log(res)
 if( res.status=="200" || res.status=="201"){ setsuccess(true)}
 else{setsuccess(false)}

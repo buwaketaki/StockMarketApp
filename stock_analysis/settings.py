@@ -91,11 +91,11 @@ WSGI_APPLICATION = 'stock_analysis.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'stockDetails',
+        'NAME': 'stockdatabase',
         'HOST':'localhost',
-        'PORT':'3306',
-        'USER':'root',
-        'PASSWORD':''
+        'PORT':'',
+        'USER':'stockuser',
+        'PASSWORD':'stock'
     }
 }
 
