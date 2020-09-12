@@ -82,7 +82,7 @@ else{setsuccess(false)}
       </div>
       </div>
       <div style={{display:"flex", flexDirection:"row", justifyContent:"center", width:"100%", marginTop:"30px", }}>
-      <button style={{border:"1px solid rgb(12, 1, 41)", padding:"3px"}} onClick={logout}><a style={{color:"black"}} href="/login">Logout</a></button> 
+      <button style={{border:"1px solid rgb(12, 1, 41)", padding:"3px"}} onClick={logout}><a style={{color:"black"}} >Logout</a></button> 
       </div> </div>
       :
        <div>
