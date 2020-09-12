@@ -4,12 +4,13 @@ import Alert from 'react-bootstrap/Alert'
 import axios from'axios'
 import { Redirect, Route } from 'react-router-dom'
 import LoginPage from './loginPage'
+import FirstPage from './firstPage'
 const AdminControls = () => {
  const [validAdmin, setvalidAdmin] = useState(false)
   const [success, setsuccess] = useState(null)
   const logout=()=>{
     sessionStorage.removeItem('token')
-    return(<Route path="/login" component={LoginPage} />)
+    return(<Route path="/" component={FirstPage} />)
   }
   useEffect(() => {
    sessionStorage.getItem('token') ? setvalidAdmin(true): setvalidAdmin(false)
