@@ -19,7 +19,7 @@ mimetypes.add_type("text/css", ".css", True)
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 
-import dj_database_url
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -144,8 +144,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'build', 'static')
 # STATICFILES_DIRS = [
 #     os.path.join(BASE_DIR, 'build', 'static'),
 # ]
-db_from_env = dj_database_url.config()
-DATABASES['default'].update(db_from_env)
+
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
