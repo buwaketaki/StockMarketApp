@@ -15,7 +15,8 @@ path('login/', views.Login),
 path('data/<stock_name>/',csrf_exempt( views.check_recent_record.as_view())),
 path('historicalData/<stock_name>/', views.check_historical_record),
 path('', indexpage, name='index'),
-path('details/', views.BasicDetails)
+path('details/', views.BasicDetails),
+path('bhavcopy/',views.bhavcopy)
 # path('getRecentInfo', views.check_recent_record)
 ]
 

@@ -15,6 +15,28 @@ from datetime import datetime, date
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 from django.views.decorators.cache import never_cache
+from nsepy.history import get_price_list
+@csrf_exempt
+def bhavcopy(request):
+     
+    dateToday = date.today().strftime("%Y-%m-%d")
+    
+    datenew = dateToday.split('-')
+    datesubs = date(int(datenew[0]),int(datenew[1]),int(datenew[2]))
+    prices = get_price_list(datesubs)
+    for ind in prices.index: 
+        print(prices['SYMBOL'][ind], prices['CLOSE'][ind]) 
+        if(prices['SYMBOL'][ind]=='HDFCBANK' or prices['SYMBOL'][ind]=='CASTROLIND' or prices['SYMBOL'][ind]=='KOTAKBANK' or prices['SYMBOL'][ind]=='HINDUNILVR'or prices['SYMBOL'][ind]=='DMART'):
+            obj={
+                'stock_name' : prices['SYMBOL'][ind],
+                'trading_date':str(date.today().strftime("%d-%b-%y")),
+                'closing_price':float(prices['CLOSE'][ind])
+            }
+            is_update_required(obj)
+    print(date.today().strftime("%d-%b-%Y"))
+    
+
+    return HttpResponse("MEOW")
 
 # Serve Single Page Application
 indexpage = TemplateView.as_view(template_name='index.html')
@@ -73,7 +95,7 @@ def is_update_required(recievedValue):
         previous_trading_date = updatedRec.trading_date
 
     # lowercircuit
-        if(recievedValue['closing_price']< updatedRec.lower_price_circuit):        
+        if(recievedValue['closing_price']< float(updatedRec.lower_price_circuit)):        
             for i in recievedValue:
                 if i=='stock_name':
                     updatedRec.stock_name = recievedValue[i]
@@ -92,7 +114,7 @@ def is_update_required(recievedValue):
                 saveToRecords(updatedRec)
                 updatedRec.save()
             #  upper circuit
-        elif(recievedValue['closing_price']> updatedRec.upper_price_circuit):
+        elif(recievedValue['closing_price']>float(updatedRec.upper_price_circuit)):
             for i in recievedValue:
                 if i=='stock_name':
                     updatedRec.stock_name = recievedValue[i]

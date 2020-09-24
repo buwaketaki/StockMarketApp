@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
-    'corsheaders'
+    'corsheaders',
+    'django_cron'
 ]
 
 MIDDLEWARE = [
@@ -94,8 +95,8 @@ DATABASES = {
         'NAME': 'stockdatabase',
         'HOST':'localhost',
         'PORT':'',
-        'USER':'stockuser',
-        'PASSWORD':'stock'
+        'USER':'root',
+        'PASSWORD':''
     }
 }
 
@@ -148,3 +149,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'build', 'static')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+CRON_CLASSES = [
+    "my_app.cron.MyCronJob",
+    # ...
+]
