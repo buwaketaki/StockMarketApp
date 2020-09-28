@@ -15,28 +15,62 @@ from datetime import datetime, date
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 from django.views.decorators.cache import never_cache
-from nsepy.history import get_price_list
+from pynse import *
+import datetime
+import celery
+datapath='C:/Users/Nisha/Documents/pynse/'
+
+nse=Nse(path=datapath)
+@celery.decorators.periodic_task(run_every=datetime.timedelta(minutes=21))
+def myTask():
+    # Do something here
+    # like accessing remote apis,
+    # calculating resource intensive computational data
+    # and store in cache
+    # or anything you please
+    print ('This wasn\'t so difficult')
 @csrf_exempt
 def bhavcopy(request):
-     
+    print("inside bhavcopy func")
     dateToday = date.today().strftime("%Y-%m-%d")
     
     datenew = dateToday.split('-')
     datesubs = date(int(datenew[0]),int(datenew[1]),int(datenew[2]))
-    prices = get_price_list(datesubs)
-    for ind in prices.index: 
-        print(prices['SYMBOL'][ind], prices['CLOSE'][ind]) 
-        if(prices['SYMBOL'][ind]=='HDFCBANK' or prices['SYMBOL'][ind]=='CASTROLIND' or prices['SYMBOL'][ind]=='KOTAKBANK' or prices['SYMBOL'][ind]=='HINDUNILVR'or prices['SYMBOL'][ind]=='DMART'):
-            obj={
-                'stock_name' : prices['SYMBOL'][ind],
-                'trading_date':str(date.today().strftime("%d-%b-%y")),
-                'closing_price':float(prices['CLOSE'][ind])
-            }
-            is_update_required(obj)
-    print(date.today().strftime("%d-%b-%Y"))
+    print(dt.date(2020,6,17))
+    print(datesubs)
+    prices = nse.bhavcopy(dt.date(2020,9,27))
+    prices.to_csv('prices.csv', index=False)
+    with open ('prices.csv', 'r') as f:
+        reader = csv.reader(f)
+        print(reader)
+        for i, row in enumerate(reader):
+            if(i==0):
+                pass
+            if(prices.index[i-1][0]=='HDFCBANK' or prices.index[i-1][0]=='CASTROLIND' or prices.index[i-1][0]=='KOTAKBANK' or prices.index[i-1][0]=='HINDUNILVR'or prices.index[i-1][0]=='DMART'):
+
+                obj={
+                    'stock_name' : prices.index[i-1][0],
+                    'trading_date':str(date.today().strftime("%d-%b-%y")),
+                    'closing_price':float(row[6])
+                }
+                print(obj)
+                is_update_required(obj)
+        
+    
+    return HttpResponse(prices)
+    # for ind in prices.index: 
+    #     print(prices.index[i-1][0], prices['CLOSE'][ind]) 
+    #     if(prices['SYMBOL'][ind]=='HDFCBANK' or prices['SYMBOL'][ind]=='CASTROLIND' or prices['SYMBOL'][ind]=='KOTAKBANK' or prices['SYMBOL'][ind]=='HINDUNILVR'or prices['SYMBOL'][ind]=='DMART'):
+    #         obj={
+    #             'stock_name' : prices['SYMBOL'][ind],
+    #             'trading_date':str(date.today().strftime("%d-%b-%y")),
+    #             'closing_price':float(prices['CLOSE'][ind])
+    #         }
+    #         is_update_required(obj)
+    # print(date.today().strftime("%d-%b-%Y"))
     
 
-    return HttpResponse("MEOW")
+    
 
 # Serve Single Page Application
 indexpage = TemplateView.as_view(template_name='index.html')

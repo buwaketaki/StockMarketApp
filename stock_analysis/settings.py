@@ -48,7 +48,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    'django_cron'
+    
+    'django_cron',
+    'djcelery',
 ]
 
 MIDDLEWARE = [
@@ -153,3 +155,10 @@ CRON_CLASSES = [
     "my_app.cron.MyCronJob",
     # ...
 ]
+# BROKER_URL = 'amqp://'
+# CELERY_ACCEPT_CONTENT = ['pickle']
+# CELERY_TASK_SERIALIZER = 'json'
+# CELERY_RESULT_SERIALIZER = 'json'
+
+# CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
+# CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
