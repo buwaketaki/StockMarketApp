@@ -21,7 +21,7 @@ function App() {
           <Route path="/history/:scripName" exact component={HistoricalData} />
           <Route path="/login" exact component={LoginPage} />
           <Route path="/recentData" exact component={RecentUpdatesTable} />
-          <Route path="/404" >
+          <Route path="*" >
           <Redirect to="/" /></Route>
         </Switch>
       </StockDataContextProvider>

@@ -18,7 +18,7 @@ from django.views.decorators.cache import never_cache
 from pynse import *
 # import datetime
 import celery
-datapath='/var/www/html'
+datapath='C:\Users\Nisha\Documents'
 
 nse=Nse(path=datapath)
 
