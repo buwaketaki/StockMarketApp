@@ -20,7 +20,7 @@ const [getlistItems, setgetlistItems] = useState(null)
     console.log("inside e=recnt data")
     try {
       const res = await axios.get(
-        "http://ec2-3-21-125-163.us-east-2.compute.amazonaws.com/scripData/" + stock_name + "/" 
+        "http://ec2-3-21-125-163.us-east-2.compute.amazonaws.com/history/" + stock_name +"/"
       );
       setrecievedData(res.data);
       console.log(res.data);
@@ -34,10 +34,10 @@ const [getlistItems, setgetlistItems] = useState(null)
     setLoading(true);
     try {
       const res = await axios.post(
-        "http://ec2-3-21-125-163.us-east-2.compute.amazonaws.com/historicalData/" + stock_name + "/"
+        "http://localhost:8000/historicalData/" + stock_name + "/"
       );
      
-      setrecievedHistoricalData(res.data.reverse());
+      setrecievedHistoricalData(res.data);
       console.log(res.data);
 
       setLoading(false);

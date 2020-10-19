@@ -48,9 +48,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    
+   # 'django_crontab',
     'django_cron',
-    'djcelery',
+
 ]
 
 MIDDLEWARE = [
@@ -97,8 +97,8 @@ DATABASES = {
         'NAME': 'stockdatabase',
         'HOST':'localhost',
         'PORT':'',
-        'USER':'root',
-        'PASSWORD':''
+        'USER':'stockuser',
+        'PASSWORD':'stock'
     }
 }
 
@@ -151,8 +151,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'build', 'static')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-CRON_CLASSES = [
-    "my_app.cron.MyCronJob",
+CRON_CLASSES =[
+'stock_analysis.cron.MyCronJob'
+
     # ...
 ]
 # BROKER_URL = 'amqp://'

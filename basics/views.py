@@ -11,46 +11,44 @@ from .serializers import UserSerializer, DataSerializer, UpdatedDataSerializer, 
 from rest_framework.parsers import JSONParser
 from django.http import JsonResponse
 from rest_framework.views import APIView
-from datetime import datetime, date
+from datetime import datetime, date, timedelta 
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 from django.views.decorators.cache import never_cache
 from pynse import *
-import datetime
+# import datetime
 import celery
-datapath='C:/Users/Nisha/Documents/pynse/'
+datapath='/var/www/html'
 
 nse=Nse(path=datapath)
-@celery.decorators.periodic_task(run_every=datetime.timedelta(minutes=21))
-def myTask():
-    # Do something here
-    # like accessing remote apis,
-    # calculating resource intensive computational data
-    # and store in cache
-    # or anything you please
-    print ('This wasn\'t so difficult')
+
 @csrf_exempt
 def bhavcopy(request):
     print("inside bhavcopy func")
-    dateToday = date.today().strftime("%Y-%m-%d")
+    d=date.today() - timedelta(days = 3) 
     
+    dateToday = d.strftime("%Y-%m-%d")
+    dateInDb=d.strftime("%d-%b-%y")
     datenew = dateToday.split('-')
+    if(datenew[2][0] == '0'):
+        datenew[2]= datenew[2][1]
     datesubs = date(int(datenew[0]),int(datenew[1]),int(datenew[2]))
-    print(dt.date(2020,6,17))
-    print(datesubs)
-    prices = nse.bhavcopy(dt.date(2020,9,27))
+    # print(datesubs.dt.date)
+
+    prices = nse.bhavcopy(dt.date(int(datenew[0]),int(datenew[1]),int(datenew[2])))
+    print(prices)
     prices.to_csv('prices.csv', index=False)
     with open ('prices.csv', 'r') as f:
         reader = csv.reader(f)
-        print(reader)
+        # print(reader)
         for i, row in enumerate(reader):
             if(i==0):
                 pass
-            if(prices.index[i-1][0]=='HDFCBANK' or prices.index[i-1][0]=='CASTROLIND' or prices.index[i-1][0]=='KOTAKBANK' or prices.index[i-1][0]=='HINDUNILVR'or prices.index[i-1][0]=='DMART'):
+            if():
 
                 obj={
                     'stock_name' : prices.index[i-1][0],
-                    'trading_date':str(date.today().strftime("%d-%b-%y")),
+                    'trading_date':str(dateInDb),
                     'closing_price':float(row[6])
                 }
                 print(obj)
@@ -96,6 +94,7 @@ def saveToHistory(updates):
     rec.closing_price = updates.closing_price
     rec.price_difference = updates.price_difference
     rec.up_or_down_circuit_indicator = updates.up_or_down_circuit_indicator
+    print(updates.up_or_down_circuit_indicator)
     rec.upper_price_circuit = updates.upper_price_circuit
     rec.lower_price_circuit = updates.lower_price_circuit
     rec.no_of_falls = updates.no_of_falls
@@ -118,18 +117,25 @@ def saveToRecords(updates):
 # handles api call data
 def is_update_required(recievedValue): 
     print("inside is update required")
-    
+        
     try:
         updatedRec =Recently_Updated_Records.objects.get(stock_name=recievedValue['stock_name'])
         print("record exists")
         previous_no_of_rises = updatedRec.no_of_rises
+
         previous_no_of_falls = updatedRec.no_of_falls
         previous_Upper_Circuit = updatedRec.upper_price_circuit
         previous_Lower_Circuit =  updatedRec.lower_price_circuit
         previous_trading_date = updatedRec.trading_date
+        previousrecord = Recently_Updated_Records.objects.filter(stock_name=recievedValue['stock_name']).first()
+        print(float(updatedRec.upper_price_circuit))
+        print(previousrecord.no_of_falls)    
+        print(recievedValue['closing_price'])
+        print(float(updatedRec.lower_price_circuit))
 
     # lowercircuit
-        if(recievedValue['closing_price']< float(updatedRec.lower_price_circuit)):        
+        if(recievedValue['closing_price']< float(updatedRec.lower_price_circuit)):    
+            print("lowercircuit")    
             for i in recievedValue:
                 if i=='stock_name':
                     updatedRec.stock_name = recievedValue[i]
@@ -140,15 +146,16 @@ def is_update_required(recievedValue):
                 updatedRec.price_difference = float(updatedRec.closing_price) * 0.05
                 updatedRec.upper_price_circuit = float(updatedRec.closing_price) * 1.05
                 updatedRec.lower_price_circuit = float(updatedRec.closing_price)* 0.95
-                updatedRec.no_of_falls = previous_no_of_falls + 1
-                updatedRec.no_of_rises = updatedRec.no_of_rises
-                updatedRec.no_of_days_since_last_circuit = dateDifference(previous_trading_date, updatedRec.trading_date )
+                updatedRec.no_of_falls = previousrecord.no_of_falls + 1
+                updatedRec.no_of_rises = previousrecord.no_of_rises
+                updatedRec.no_of_days_since_last_circuit = dateDifference(previousrecord.trading_date, updatedRec.trading_date )
                 updatedRec.up_or_down_circuit_indicator ='Down'
                 saveToHistory(updatedRec)
                 saveToRecords(updatedRec)
                 updatedRec.save()
             #  upper circuit
-        elif(recievedValue['closing_price']>float(updatedRec.upper_price_circuit)):
+        elif(float(recievedValue['closing_price'])>float(updatedRec.upper_price_circuit)):
+            print("uppercircuit")
             for i in recievedValue:
                 if i=='stock_name':
                     updatedRec.stock_name = recievedValue[i]
@@ -159,16 +166,17 @@ def is_update_required(recievedValue):
             updatedRec.price_difference = float(updatedRec.closing_price) * 0.05
             updatedRec.upper_price_circuit = float(updatedRec.closing_price) * 1.05
             updatedRec.lower_price_circuit = float(updatedRec.closing_price)* 0.95
-            updatedRec.no_of_falls = previous_no_of_falls 
-            updatedRec.no_of_rises = (updatedRec.no_of_rises) + 1
-            updatedRec.no_of_days_since_last_circuit = dateDifference(previous_trading_date, updatedRec.trading_date )
+            updatedRec.no_of_falls = previousrecord.no_of_falls 
+            updatedRec.no_of_rises = previousrecord.no_of_rises + 1
+            updatedRec.no_of_days_since_last_circuit = dateDifference(previousrecord.trading_date, updatedRec.trading_date )
             updatedRec.up_or_down_circuit_indicator ='Up'
             saveToHistory(updatedRec)
             saveToRecords(updatedRec)
             updatedRec.save() 
-            
+        
         
         else:
+            print("dummy")
             dummyData = All_Records_Table()
             dummyData.stock_name = recievedValue['stock_name']
             dummyData.trading_date = recievedValue['trading_date']
@@ -188,23 +196,23 @@ def is_update_required(recievedValue):
         # make entry in log file
         newLog.Action =str("Scrip Name" +" "+ recievedValue['stock_name']+ " "+"not present")
         newLog.save()
-        updatedRec = Recently_Updated_Records()
-        rec = Historical_stock_prices()
+#        updatedRec = Recently_Updated_Records()
+ #       rec = Historical_stock_prices()
         dummyData = All_Records_Table()
-        updatedRec.stock_name = recievedValue['stock_name']
-        updatedRec.closing_price = recievedValue['closing_price']
-        updatedRec.trading_date = recievedValue['trading_date']        
-        updatedRec.price_difference = float(updatedRec.closing_price) * 0.05
-        updatedRec.upper_price_circuit = float(updatedRec.closing_price) * 1.05
-        updatedRec.lower_price_circuit = float(updatedRec.closing_price)* 0.95
-        updatedRec.no_of_falls = 0
-        updatedRec.no_of_rises = 0
-        updatedRec.no_of_days_since_last_circuit=0
-        updatedRec.up_or_down_circuit_indicator =''
+  #      updatedRec.stock_name = recievedValue['stock_name']
+   #     updatedRec.closing_price = recievedValue['closing_price']
+    #    updatedRec.trading_date = recievedValue['trading_date']        
+     #   updatedRec.price_difference = float(updatedRec.closing_price) * 0.05
+      #  updatedRec.upper_price_circuit = float(updatedRec.closing_price) * 1.05
+      #  updatedRec.lower_price_circuit = float(updatedRec.closing_price)* 0.95
+       # updatedRec.no_of_falls = 0
+       # updatedRec.no_of_rises = 0
+       # updatedRec.no_of_days_since_last_circuit=0
+       # updatedRec.up_or_down_circuit_indicator =''
        
-        saveToHistory(updatedRec)
-        saveToRecords(updatedRec)
-        updatedRec.save()
+       # saveToHistory(updatedRec)
+       # saveToRecords(updatedRec)
+       # updatedRec.save()
        
    
         
@@ -240,106 +248,108 @@ def addRecordsToAll_Records_Table(rec):
 # evaluate historicat_prices_sheet of every scrip
 def index(request):
     
-#     with open ('dmartOneYear.csv', 'r') as f:
-#         reader = csv.reader(f)
-#         entries=[]
-#         priceUpRecord=[]
-#         priceDownRecord=[]
-#         dateRecords=[]
-#         cnt=1
-#         nUps=0
-#         nDowns=0
-#         for i, row in enumerate(reader):
-#             isScripRecordPresent =Recently_Updated_Records.objects.filter(stock_name=row[0])[:1]
-#         #  ignore title of column   
-#             if (i==0):
-#                 print("wrong")
-#                 pass
-#             elif(i==1):
+    with open ('TCS.csv', 'r') as f:
+        reader = csv.reader(f)
+        entries=[]
+        priceUpRecord=[]
+        priceDownRecord=[]
+        dateRecords=[]
+        cnt=1
+        nUps=0
+        nDowns=0
+        for i, row in enumerate(reader):
+            isScripRecordPresent =Recently_Updated_Records.objects.filter(stock_name=row[0])[:1]
+        #  ignore title of column   
+            if (i==0):
+                print("wrong")
+                pass
+            elif(i==1):
                 
-#                 rec = Historical_stock_prices()
-#                 print(len(isScripRecordPresent))
-#                 row = " ".join(row)
-#                 row = row.replace(";"," ")
-#                 row= row.split()
-#                 rec.stock_name =row[0]
-#                 print("close" + row[2])
-#                 rec.trading_date = row[2]
-#                 rec.closing_price= row[8]
-#                 addRecordsToAll_Records_Table(rec)
-#                 rec.price_difference =float(row[8])*0.05
-#                 rec.upper_price_circuit =   (float(row[8])*0.05) +   float(row[8])
-#                 rec.lower_price_circuit =  float(row[8])-(float(row[8])*0.05)   
-#                 rec.no_of_days_since_last_circuit= 0
-#                 rec.up_or_down_circuit_indicator='nil'
-#                 priceUpRecord.insert(0,float(rec.upper_price_circuit))
-#                 priceDownRecord.insert(0,rec.lower_price_circuit)
-#                 rec.no_of_rises=0
-#                 rec.no_of_falls=0
-#                 entries.append(rec)
-#                 dateRecords.insert(0,rec.trading_date)
-#                 print("executed")
-#                 rec.save()
-#                 if(len(isScripRecordPresent) == 0):
-#                     TrackUpdates(rec)
-#                 pass
-#             else:
-#                 cnt+=1
-#                 rec = Historical_stock_prices()
-#                 row = " ".join(row)
-#                 row = row.replace(";"," ")
-#                 row= row.split(" ")
-#                 rec.stock_name = row[0]
-#                 rec.trading_date = row[2]
-#                 rec.closing_price= row[8]
-#                 print("closingprice" + rec.closing_price)
-#                 print(priceUpRecord[0])
-# # checking for lower price
-#                 if(float(rec.closing_price) > float(priceUpRecord[0])):
-#                     rec.price_difference =float(row[8])*0.05
-#                     rec.upper_price_circuit =   (float(row[8])*0.05) +   float(row[8])
-#                     priceUpRecord.insert(0,rec.upper_price_circuit)
-#                     rec.lower_price_circuit = float(row[8])- (float(row[8])*0.05) 
-#                     priceDownRecord.insert(0,rec.lower_price_circuit)
-#                     nUps +=1
+                rec = Historical_stock_prices()
+                print(len(isScripRecordPresent))
+                row = " ".join(row)
+                row = row.replace(";"," ")
+                row= row.split()
+                rec.stock_name =row[0]
+                print("close" + row[2])
+                rec.trading_date = row[2]
+                rec.closing_price= row[8]
+                addRecordsToAll_Records_Table(rec)
+                rec.price_difference =float(row[8])*0.05
+                rec.upper_price_circuit =   (float(row[8])*0.05) +   float(row[8])
+                rec.lower_price_circuit =  float(row[8])-(float(row[8])*0.05)   
+                rec.no_of_days_since_last_circuit= 0
+                rec.up_or_down_circuit_indicator='nil'
+                priceUpRecord.insert(0,float(rec.upper_price_circuit))
+                priceDownRecord.insert(0,rec.lower_price_circuit)
+                rec.no_of_rises=0
+                rec.no_of_falls=0
+                entries.append(rec)
+                dateRecords.insert(0,rec.trading_date)
+                print("executed")
+                rec.save()
+                if(len(isScripRecordPresent) == 0):
+                    TrackUpdates(rec)
+                pass
+            else:
+                cnt+=1
+                rec = Historical_stock_prices()
+                row = " ".join(row)
+                row = row.replace(";"," ")
+                row= row.split(" ")
+                rec.stock_name = row[0]
+                rec.trading_date = row[2]
+                rec.closing_price= row[8]
+                print(row[8])
+                print("closingprice" + rec.closing_price)
+                print(priceUpRecord[0])
+# checking for lower price
+
+                if(float(rec.closing_price) > float(priceUpRecord[0])):
+                    rec.price_difference =float(row[8])*0.05
+                    rec.upper_price_circuit =   (float(row[8])*0.05) +   float(row[8])
+                    priceUpRecord.insert(0,rec.upper_price_circuit)
+                    rec.lower_price_circuit = float(row[8])- (float(row[8])*0.05) 
+                    priceDownRecord.insert(0,rec.lower_price_circuit)
+                    nUps +=1
                     
-#                     rec.no_of_days_since_last_circuit = dateDifference(dateRecords[0], rec.trading_date)
-#                     dateRecords.insert(0,rec.trading_date)
-#                     rec.up_or_down_circuit_indicator ='Up'
-#                     rec.no_of_rises = nUps
-#                     rec.no_of_falls = nDowns
-#                     addRecordsToAll_Records_Table(rec)
-#                     rec.save()
-#                     if(len(isScripRecordPresent) != 0):
-#                         TrackUpdates(rec)
-# # checking for upper price   
-#                 elif(float(rec.closing_price) < float(priceDownRecord[0])):
-#                     rec.price_difference =float(row[8])*0.05
-#                     rec.lower_price_circuit = float(row[8])- (float(row[8])*0.05) 
-#                     priceDownRecord.insert(0,rec.lower_price_circuit)
-#                     rec.upper_price_circuit =   (float(row[8])*0.05) +   float(row[8])
-#                     priceUpRecord.insert(0,rec.upper_price_circuit)
+                    rec.no_of_days_since_last_circuit = dateDifference(dateRecords[0], rec.trading_date)
+                    dateRecords.insert(0,rec.trading_date)
+                    rec.up_or_down_circuit_indicator ='Up'
+                    rec.no_of_rises = nUps
+                    rec.no_of_falls = nDowns
+                    addRecordsToAll_Records_Table(rec)
+                    rec.save()
+                    if(len(isScripRecordPresent) != 0):
+                        TrackUpdates(rec)
+# checking for upper price   
+                elif(float(rec.closing_price) < float(priceDownRecord[0])):
+                    rec.price_difference =float(row[8])*0.05
+                    rec.lower_price_circuit = float(row[8])- (float(row[8])*0.05) 
+                    priceDownRecord.insert(0,rec.lower_price_circuit)
+                    rec.upper_price_circuit =   (float(row[8])*0.05) +   float(row[8])
+                    priceUpRecord.insert(0,rec.upper_price_circuit)
                    
-#                     rec.no_of_days_since_last_circuit= dateDifference(dateRecords[0], rec.trading_date)
-#                     dateRecords.insert(0,rec.trading_date)
-#                     nDowns +=1
-#                     rec.up_or_down_circuit_indicator ='Down'
-#                     rec.no_of_rises = nUps
-#                     rec.no_of_falls = nDowns
-#                     addRecordsToAll_Records_Table(rec)
-#                     rec.save()
-#                     if(len(isScripRecordPresent) != 0):
-#                         TrackUpdates(rec)
-#                 else:
+                    rec.no_of_days_since_last_circuit= dateDifference(dateRecords[0], rec.trading_date)
+                    dateRecords.insert(0,rec.trading_date)
+                    nDowns +=1
+                    rec.up_or_down_circuit_indicator ='Down'
+                    rec.no_of_rises = nUps
+                    rec.no_of_falls = nDowns
+                    addRecordsToAll_Records_Table(rec)
+                    rec.save()
+                    if(len(isScripRecordPresent) != 0):
+                        TrackUpdates(rec)
+                else:
                     
-#                     rec.price_difference =" "
-#                     rec.lower_price_circuit =   " "
-#                     rec.upper_price_circuit=" "
-#                     rec.no_of_days_since_last_circuit=""
-#                     rec.no_of_falls = nDowns
-#                     rec.no_of_rises = nUps
-#                     addRecordsToAll_Records_Table(rec)
-#                 entries.append(rec)
+                    rec.price_difference =" "
+                    rec.lower_price_circuit =   " "
+                    rec.upper_price_circuit=" "
+                    rec.no_of_days_since_last_circuit=""
+                    rec.no_of_falls = nDowns
+                    rec.no_of_rises = nUps
+                    addRecordsToAll_Records_Table(rec)
+                entries.append(rec)
     return HttpResponse('<h1>basics</h1>')
 
 # Handling restapi calls
@@ -415,6 +425,7 @@ def get_object( stock_name):
     # no of ups
         try:
             data =Historical_stock_prices.objects.filter(stock_name=stock_name)
+            print(data)
             currentData = All_Records_Table.objects.filter(stock_name=stock_name)
             no_of_back_to_back_ups=[]
             i=0

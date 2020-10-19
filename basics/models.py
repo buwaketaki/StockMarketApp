@@ -14,7 +14,7 @@ class Historical_stock_prices(models.Model):
     no_of_falls= models.IntegerField(blank=True, default=0)
 
     def __str__(self):
-        return self.Name
+        return self.stock_name
 
 class Recently_Updated_Records(models.Model):
     stock_name= models.CharField(max_length=200, blank=True, primary_key=True)
